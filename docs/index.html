@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מחשבון שכר נטו ונקודות זיכוי מבית יובלים פמילי אופיס</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            background-color: #f8f9fa;
+        }
+        .calculator-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-top: 2rem;
+            position: relative;
+        }
+        .logo {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            width: 150px;
+            height: auto;
+            object-fit: contain;
+        }
+        @media (max-width: 768px) {
+            .logo {
+                position: static;
+                display: block;
+                margin: 0 auto 1rem;
+                width: 120px;
+            }
+        }
+        .result-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .calculator-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                background-color: white;
+            }
+        }
+        #childrenInputs {
+            display: none;
+        }
+        #childrenInputs.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="calculator-container">
+            <img src="https://raw.githubusercontent.com/hyaron3880/salary-calculator/main/static/images/1לוגו%20יובלים%20סופי-01.png" alt="לוגו" class="logo">
+            <h2 class="text-center mb-4">מחשבון שכר נטו ונקודות זיכוי מבית יובלים פמילי אופיס</h2>
+            
+            <form id="salaryForm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="grossSalary" class="form-label">שכר ברוטו:</label>
+                            <input type="number" class="form-control" id="grossSalary" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="gender" class="form-label">מגדר:</label>
+                            <select class="form-select" id="gender" required>
+                                <option value="">בחר/י מגדר</option>
+                                <option value="male">זכר</option>
+                                <option value="female">נקבה</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="maritalStatus" class="form-label">מצב משפחתי:</label>
+                            <select class="form-select" id="maritalStatus" required>
+                                <option value="">בחר/י מצב משפחתי</option>
+                                <option value="single">רווק/ה</option>
+                                <option value="married">נשוי/אה</option>
+                                <option value="divorced">גרוש/ה</option>
+                                <option value="widowed">אלמן/ה</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">האם יש לך ילדים?</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="hasChildren">
+                                <label class="form-check-label" for="hasChildren">
+                                    כן, יש לי ילדים
+                                </label>
+                            </div>
+                        </div>
+                        <div id="childrenInputs">
+                            <div class="mb-3">
+                                <label for="childrenUnder6" class="form-label">מספר ילדים מתחת לגיל 6:</label>
+                                <input type="number" class="form-control" id="childrenUnder6" min="0" value="0">
+                            </div>
+                            <div class="mb-3">
+                                <label for="childrenUnder18" class="form-label">מספר ילדים מגיל 6 עד 18:</label>
+                                <input type="number" class="form-control" id="childrenUnder18" min="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary">חשב שכר נטו</button>
+                    <button type="button" class="btn btn-secondary ms-2" onclick="resetForm()">נקה טופס</button>
+                    <button type="button" class="btn btn-info ms-2" onclick="window.print()">הדפס/שמור PDF</button>
+                </div>
+            </form>
+
+            <div id="result" class="result-card mt-4" style="display: none;">
+                <h4 class="text-center mb-3">תוצאות החישוב:</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>שכר נטו:</strong> <span id="netSalary"></span> ₪</p>
+                        <p><strong>ביטוח לאומי:</strong> <span id="nationalInsurance"></span> ₪</p>
+                        <p><strong>ביטוח בריאות:</strong> <span id="healthInsurance"></span> ₪</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>מס הכנסה:</strong> <span id="incomeTax"></span> ₪</p>
+                        <p><strong>נקודות זיכוי:</strong> <span id="taxCredits"></span></p>
+                        <p><strong>שווי נקודות זיכוי:</strong> <span id="taxCreditsValue"></span> ₪</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('hasChildren').addEventListener('change', function() {
+            const childrenInputs = document.getElementById('childrenInputs');
+            if (this.checked) {
+                childrenInputs.classList.add('show');
+            } else {
+                childrenInputs.classList.remove('show');
+                document.getElementById('childrenUnder6').value = '0';
+                document.getElementById('childrenUnder18').value = '0';
+            }
+        });
+
+        function resetForm() {
+            document.getElementById('salaryForm').reset();
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('childrenInputs').classList.remove('show');
+        }
+
+        document.getElementById('salaryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const grossSalary = parseFloat(document.getElementById('grossSalary').value);
+            const gender = document.getElementById('gender').value;
+            const maritalStatus = document.getElementById('maritalStatus').value;
+            const hasChildren = document.getElementById('hasChildren').checked;
+            const childrenUnder6 = hasChildren ? parseInt(document.getElementById('childrenUnder6').value) : 0;
+            const childrenUnder18 = hasChildren ? parseInt(document.getElementById('childrenUnder18').value) : 0;
+
+            // Calculate tax credits
+            let taxCredits = 2.25; // Base credit points for all
+            
+            // Add credits based on gender and marital status
+            if (gender === 'female') {
+                taxCredits += 0.5;
+                if (maritalStatus === 'married') {
+                    taxCredits += 0.5;
+                }
+            }
+            
+            // Add credits for children
+            if (hasChildren) {
+                taxCredits += childrenUnder6 * 1.5;
+                taxCredits += childrenUnder18 * 1.0;
+            }
+
+            const taxCreditValue = 2820;
+            const totalTaxCredits = taxCredits * taxCreditValue;
+
+            // Calculate income tax brackets
+            let incomeTax = 0;
+            let remainingSalary = grossSalary;
+            
+            const brackets = [
+                { limit: 6790, rate: 0.10 },
+                { limit: 9730, rate: 0.14 },
+                { limit: 15620, rate: 0.20 },
+                { limit: 21710, rate: 0.31 },
+                { limit: 45180, rate: 0.35 },
+                { limit: 58190, rate: 0.47 },
+                { limit: Infinity, rate: 0.50 }
+            ];
+
+            let currentBracketStart = 0;
+            for (const bracket of brackets) {
+                const bracketAmount = Math.min(remainingSalary, bracket.limit - currentBracketStart);
+                if (bracketAmount > 0) {
+                    incomeTax += bracketAmount * bracket.rate;
+                    remainingSalary -= bracketAmount;
+                    currentBracketStart = bracket.limit;
+                }
+                if (remainingSalary <= 0) break;
+            }
+
+            // Subtract tax credits
+            incomeTax = Math.max(0, incomeTax - totalTaxCredits);
+
+            // Calculate National Insurance
+            let nationalInsurance = 0;
+            if (grossSalary <= 7122) {
+                nationalInsurance = grossSalary * 0.004;
+            } else if (grossSalary <= 47465) {
+                nationalInsurance = 7122 * 0.004 + (grossSalary - 7122) * 0.07;
+            } else {
+                nationalInsurance = 7122 * 0.004 + (47465 - 7122) * 0.07;
+            }
+
+            // Calculate Health Insurance
+            let healthInsurance = 0;
+            if (grossSalary <= 7122) {
+                healthInsurance = grossSalary * 0.031;
+            } else if (grossSalary <= 47465) {
+                healthInsurance = 7122 * 0.031 + (grossSalary - 7122) * 0.05;
+            } else {
+                healthInsurance = 7122 * 0.031 + (47465 - 7122) * 0.05;
+            }
+
+            // Calculate net salary
+            const netSalary = grossSalary - incomeTax - nationalInsurance - healthInsurance;
+
+            // Display results
+            document.getElementById('netSalary').textContent = netSalary.toFixed(2);
+            document.getElementById('incomeTax').textContent = incomeTax.toFixed(2);
+            document.getElementById('nationalInsurance').textContent = nationalInsurance.toFixed(2);
+            document.getElementById('healthInsurance').textContent = healthInsurance.toFixed(2);
+            document.getElementById('taxCredits').textContent = taxCredits.toFixed(2);
+            document.getElementById('taxCreditsValue').textContent = totalTaxCredits.toFixed(2);
+            
+            document.getElementById('result').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
