@@ -141,4 +141,5 @@ def calculate():
         return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5004)
+    # Use development server when running locally
+    app.run(debug=False, port=5004)
